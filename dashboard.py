@@ -11,13 +11,12 @@ from config import MAX_PORTFOLIO_STOCKS
 from data_ingestion import fetch_stock_data
 from strategies import STRATEGY_REGISTRY
 from regime_detector import get_regime_summary
-from analytics import calculate_equity_curve, calculate_metrics
+from analytics import calculate_equity_curve, calculate_metrics, calculate_buy_and_hold_benchmark
 from portfolio import run_portfolio_backtest, build_portfolio_returns, compare_portfolio_vs_best_single
 from forecasting import generate_forecast
 
 st.title("QuantTrack — Trading Strategy Backtester")
 
-# --- Single-stock backtest section ---
 ticker = st.text_input("Enter stock ticker (e.g. RELIANCE.NS)", "RELIANCE.NS")
 strategy_choice = st.selectbox("Choose a strategy", list(STRATEGY_REGISTRY.keys()))
 run_button = st.button("Run Backtest")
@@ -42,13 +41,25 @@ if run_button:
         st.subheader("Price Chart")
         st.line_chart(data["Close"])
 
-        st.subheader("Equity Curve")
-        st.line_chart(equity_result["Equity_Curve"])
+        benchmark = calculate_buy_and_hold_benchmark(data)
+        comparison_chart = equity_result[["Equity_Curve"]].join(benchmark)
+        comparison_chart.columns = ["Strategy", "Buy & Hold Benchmark"]
+
+        st.subheader("Strategy vs. Buy & Hold Benchmark")
+        st.line_chart(comparison_chart)
+
+        benchmark_return = round((benchmark["Benchmark_Equity"].iloc[-1] - 1) * 100, 2)
+        strategy_return = metrics["Total Return (%)"]
+
+        if strategy_return > benchmark_return:
+            st.success(f"Strategy outperformed Buy & Hold by {round(strategy_return - benchmark_return, 2)} percentage points")
+        else:
+            st.warning(f"Strategy underperformed Buy & Hold by {round(benchmark_return - strategy_return, 2)} percentage points")
 
         st.subheader("Performance Metrics")
         st.table(pd.DataFrame(metrics, index=["Value"]).T)
+        st.caption(f"Buy & Hold Benchmark Total Return: {benchmark_return}% | Transaction costs of 0.1% per trade applied to strategy returns")
 
-# --- Multi-stock portfolio section ---
 st.divider()
 st.header("Multi-Stock Portfolio Comparison")
 
@@ -77,7 +88,6 @@ if portfolio_button:
         st.subheader("Portfolio vs Best Single Stock")
         st.table(comparison)
 
-# --- Forecasting section ---
 st.divider()
 st.header("30-Day Price Forecast")
 
