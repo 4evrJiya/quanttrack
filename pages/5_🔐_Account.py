@@ -1,19 +1,40 @@
 """
-QuantTrack — Account Page (Signup / Login / Logout)
+QuantTrack — Account Page (Signup / Login / Logout / Watchlist)
 """
 
 import streamlit as st
 from auth import create_user, verify_user
+from watchlist import get_watchlist, add_to_watchlist, remove_from_watchlist
 
 st.set_page_config(page_title="Account - QuantTrack", page_icon="🔐", layout="wide")
 
 st.title("🔐 Account")
 
-# --- If already logged in, show that instead of login/signup forms ---
 if "logged_in_user" in st.session_state:
+    user_id = st.session_state["logged_in_user"]
     st.success(f"You're logged in as **{st.session_state['logged_in_username']}**")
-    st.write("Head to the Backtest, Portfolio, or Forecast pages — your results can now be saved to your history and watchlist.")
 
+    st.subheader("⭐ Your Watchlist")
+    watchlist = get_watchlist(user_id)
+
+    if not watchlist:
+        st.info("Your watchlist is empty. Add a stock below.")
+    else:
+        for stock in watchlist:
+            col1, col2 = st.columns([4, 1])
+            col1.write(stock)
+            if col2.button("Remove", key=f"remove_{stock}"):
+                remove_from_watchlist(user_id, stock)
+                st.rerun()
+
+    new_ticker = st.text_input("Add a ticker to your watchlist", key="new_watchlist_ticker")
+    if st.button("Add to Watchlist"):
+        if new_ticker:
+            success, message = add_to_watchlist(user_id, new_ticker)
+            st.success(message) if success else st.warning(message)
+            st.rerun()
+
+    st.divider()
     if st.button("Log Out"):
         del st.session_state["logged_in_user"]
         del st.session_state["logged_in_username"]
@@ -30,12 +51,12 @@ else:
         if st.button("Log In"):
             success, result = verify_user(login_username, login_password)
             if success:
-                st.session_state["logged_in_user"] = result  # this is the user_id
+                st.session_state["logged_in_user"] = result
                 st.session_state["logged_in_username"] = login_username
                 st.success("Logged in successfully!")
                 st.rerun()
             else:
-                st.error(result)  # result is the error message in this case
+                st.error(result)
 
     with tab_signup:
         st.subheader("Sign Up")
