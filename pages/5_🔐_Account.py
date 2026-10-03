@@ -1,10 +1,12 @@
 """
-QuantTrack — Account Page (Signup / Login / Logout / Watchlist)
+QuantTrack — Account Page (Signup / Login / Logout / Watchlist / History)
 """
 
 import streamlit as st
+import pandas as pd
 from auth import create_user, verify_user
 from watchlist import get_watchlist, add_to_watchlist, remove_from_watchlist
+from history import get_history
 
 st.set_page_config(page_title="Account - QuantTrack", page_icon="🔐", layout="wide")
 
@@ -33,6 +35,19 @@ if "logged_in_user" in st.session_state:
             success, message = add_to_watchlist(user_id, new_ticker)
             st.success(message) if success else st.warning(message)
             st.rerun()
+
+    st.divider()
+    st.subheader("📜 Your Backtest History")
+    history_rows = get_history(user_id)
+
+    if not history_rows:
+        st.info("No saved backtests yet. Run a backtest and save it to see it here.")
+    else:
+        history_df = pd.DataFrame(
+            history_rows,
+            columns=["Ticker", "Strategy", "Total Return (%)", "Sharpe Ratio", "Max Drawdown (%)", "Run At"]
+        )
+        st.dataframe(history_df, use_container_width=True)
 
     st.divider()
     if st.button("Log Out"):
