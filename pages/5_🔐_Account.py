@@ -45,7 +45,7 @@ if "logged_in_user" in st.session_state:
     else:
         history_df = pd.DataFrame(
             history_rows,
-            columns=["Ticker", "Strategy", "Total Return (%)", "Sharpe Ratio", "Max Drawdown (%)", "Run At"]
+            columns=["Type", "Ticker", "Strategy", "Total Return (%)", "Sharpe Ratio", "Max Drawdown (%)", "Notes", "Run At"]
         )
         st.dataframe(history_df, use_container_width=True)
 
