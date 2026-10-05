@@ -10,6 +10,10 @@ from history import save_forecast_result
 
 st.set_page_config(page_title="Forecast - QuantTrack", page_icon="🔮", layout="wide")
 
+from ui_helpers import apply_custom_css, render_sidebar_status
+apply_custom_css()
+render_sidebar_status()
+
 st.title("🔮 30-Day Price Forecast")
 st.caption("A trend projection based on historical patterns — not a guaranteed prediction.")
 

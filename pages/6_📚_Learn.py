@@ -6,6 +6,10 @@ import streamlit as st
 
 st.set_page_config(page_title="Learn - QuantTrack", page_icon="📚", layout="wide")
 
+from ui_helpers import apply_custom_css, render_sidebar_status
+apply_custom_css()
+render_sidebar_status()
+
 st.title("📚 Learn")
 st.caption("New to trading or investing? Start here before using the other pages.")
 

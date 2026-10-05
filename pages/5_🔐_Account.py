@@ -10,6 +10,10 @@ from history import get_history
 
 st.set_page_config(page_title="Account - QuantTrack", page_icon="🔐", layout="wide")
 
+from ui_helpers import apply_custom_css, render_sidebar_status
+apply_custom_css()
+render_sidebar_status()
+
 st.title("🔐 Account")
 
 if "logged_in_user" in st.session_state:

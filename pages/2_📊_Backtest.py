@@ -13,6 +13,10 @@ from history import save_backtest
 
 st.set_page_config(page_title="Backtest - QuantTrack", page_icon="📊", layout="wide")
 
+from ui_helpers import apply_custom_css, render_sidebar_status
+apply_custom_css()
+render_sidebar_status()
+
 METRIC_TOOLTIPS = {
     "Total Return (%)": "The overall percentage gain or loss over the selected period.",
     "Sharpe Ratio": "Return earned per unit of risk taken. Above 1 is generally good; above 2 is very good.",

@@ -11,6 +11,10 @@ from history import save_portfolio_result
 
 st.set_page_config(page_title="Portfolio - QuantTrack", page_icon="💼", layout="wide")
 
+from ui_helpers import apply_custom_css, render_sidebar_status
+apply_custom_css()
+render_sidebar_status()
+
 st.title("💼 Multi-Stock Portfolio Comparison")
 st.caption(f"Compare an equally-weighted portfolio of up to {MAX_PORTFOLIO_STOCKS} stocks against the single best performer.")
 
